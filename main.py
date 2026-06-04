@@ -13,8 +13,13 @@ class GUI:
         questions = [l for l in open("questions.txt", encoding="utf-8").readlines() if l.strip()]
 
         self.hundred_random_questions = random.sample(questions, 100)
+        
+        with open("random_questions.txt", "w", encoding="utf-8") as f:
+            f.writelines(self.hundred_random_questions)
 
         self.timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        
+        self.current_question_index = 0
 
         self.root = tk.Tk()
         self.root.title("Amateur Radio License Practice Test")
@@ -69,7 +74,8 @@ class GUI:
         self.check_answer_button.config(state="active")
         self.next_button.config(state="disabled")
         # line to derive question and answer from
-        qa_derive_from = random.choice(self.hundred_random_questions).split(";")
+        # qa_derive_from = random.choice(self.hundred_random_questions).split(";")
+        qa_derive_from = self.hundred_random_questions[self.current_question_index].split(";")
         four_answers = qa_derive_from[2:6]
         correct_answer = qa_derive_from[2].strip()
         question = qa_derive_from[1].strip()

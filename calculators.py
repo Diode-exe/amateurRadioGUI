@@ -3,6 +3,7 @@ import tkinter as tk
 from calc_source.ohms_law import OhmsLawCalculator
 from calc_source.wavelength import WavelengthCalculator
 from calc_source.reduced_power import ReducedPowerCalculator
+from calc_source.frequency_meter import FrequencyMeterConverter
 
 class Calculators:
     def __init__(self, parent):
@@ -22,7 +23,7 @@ class Calculators:
         self.create_calculator_buttons()
 
     def create_calculator_buttons(self):
-        calculator_names = ["Ohm's Law", "Wavelength", "Reduced Power"]
+        calculator_names = ["Ohm's Law", "Wavelength", "Reduced Power", "Frequency/Meter"]
         for name in calculator_names:
             btn = ttk.Button(self.calc_window, text=name, width=20, command=lambda n=name: self.open_calculator(n))
             btn.pack(pady=5)
@@ -38,3 +39,6 @@ class Calculators:
         elif name == "Reduced Power":
             reduced_power_calculator = ReducedPowerCalculator(self.parent)
             reduced_power_calculator.open_reduced_power_calculator()
+        elif name == "Frequency/Meter":
+            frequency_meter_converter = FrequencyMeterConverter(self.parent)
+            frequency_meter_converter.open_frequency_converter()
