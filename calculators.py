@@ -2,6 +2,7 @@ from tkinter import ttk
 import tkinter as tk
 from calc_source.ohms_law import OhmsLawCalculator
 from calc_source.wavelength import WavelengthCalculator
+from calc_source.reduced_power import ReducedPowerCalculator
 
 class Calculators:
     def __init__(self, parent):
@@ -21,7 +22,7 @@ class Calculators:
         self.create_calculator_buttons()
 
     def create_calculator_buttons(self):
-        calculator_names = ["Ohm's Law", "Wavelength"]
+        calculator_names = ["Ohm's Law", "Wavelength", "Reduced Power"]
         for name in calculator_names:
             btn = ttk.Button(self.calc_window, text=name, width=20, command=lambda n=name: self.open_calculator(n))
             btn.pack(pady=5)
@@ -34,13 +35,6 @@ class Calculators:
         elif name == "Wavelength":
             wavelength_calculator = WavelengthCalculator(self.parent)
             wavelength_calculator.open_wavelength_calculator()
-
-    def calculate_reduced_power(start_power_watts, db_reduction):
-        """Calculates the target power needed after a specific dB reduction."""
-        # Convert the dB reduction back to a raw power ratio
-        # Ratio = 10^(dB / 10)
-        power_ratio = 10 ** (db_reduction / 10)
-
-        # Divide starting power by the ratio to get the target power
-        target_power = start_power_watts / power_ratio
-        return target_power
+        elif name == "Reduced Power":
+            reduced_power_calculator = ReducedPowerCalculator(self.parent)
+            reduced_power_calculator.open_reduced_power_calculator()
