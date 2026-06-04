@@ -9,3 +9,6 @@ wheels/
 # Virtual environments
 .venv
 questions.txt
+
+user_answers/
+user_answers_*.txt

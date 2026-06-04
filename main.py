@@ -13,6 +13,9 @@ class GUI:
         questions = [l for l in open("questions.txt", encoding="utf-8").readlines() if l.strip()]
 
         self.hundred_random_questions = random.sample(questions, 100)
+
+        self.timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+
         self.root = tk.Tk()
         self.root.title("Amateur Radio License Practice Test")
         self.root.geometry("500x400")
@@ -23,14 +26,14 @@ class GUI:
         self.root.bind("2", lambda e: self.choice_buttons[1].invoke())
         self.root.bind("3", lambda e: self.choice_buttons[2].invoke())
         self.root.bind("4", lambda e: self.choice_buttons[3].invoke())
-            
+
         self.calculators_frame = tk.Frame(self.root)
         self.calculators_frame.pack(pady=10)
-        
+
         # self.calculators = Calculators(self)
         self.calculators_button = tk.Button(self.calculators_frame, text="Open Calculators", command=self.open_calculators)
         self.calculators_button.pack()
-        
+
         self.question_label = tk.Label(self.root, text="", wraplength=400, font=("Arial", 14))
         self.question_label.pack(pady=20)
 
@@ -106,8 +109,7 @@ class GUI:
         else:
             messagebox.showinfo("Result", f"Wrong! The correct answer was: {correct_answer_text}")
             self.check_answer_button.config(state="disabled")
-        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        with open(f"user_answers_{timestamp}.txt", "a", encoding="utf-8") as f:
+        with open(f"user_answers/user_answers_{self.timestamp}.txt", "a", encoding="utf-8") as f:
             f.write(f"Q: {self.question_label.cget('text')}\n")
             f.write(f"Selected: {selected_answer_text}\n")
             f.write(f"Correct: {correct_answer_text}\n\n")
@@ -121,19 +123,23 @@ class GUI:
             messagebox.showinfo("Test Complete", f"You've completed the test! Your score: {self.correct_count}/100")
             self.check_answer_button.config(state="disabled")
             self.next_button.config(state="disabled")
-        
+
     def open_calculators(self):
         calcu = Calculators(self)
-    
+
     def closer(self):
         if messagebox.askyesno("Quit", "Do you want to quit?"):
             self.root.destroy()
-            
+
     def enter_check_next(self, event):
         if self.check_answer_button['state'] == 'active':
             self.check_answer()
         elif self.next_button['state'] == 'active':
             self.show_random_question()
+        else:
+            # This case should not happen, but just in case both buttons are disabled, we can show a warning
+            # hopefully this fixes a bug with the Enter key not working after switching windows
+            messagebox.showwarning("Something went wrong", "Both buttons are disabled (for some reason). Please try again.")
 
 if __name__ == "__main__":
     gui = GUI()
