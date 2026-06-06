@@ -13,12 +13,12 @@ class GUI:
         questions = [l for l in open("questions.txt", encoding="utf-8").readlines() if l.strip()]
 
         self.hundred_random_questions = random.sample(questions, 100)
-        
+
         with open("random_questions.txt", "w", encoding="utf-8") as f:
             f.writelines(self.hundred_random_questions)
 
         self.timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        
+
         self.current_question_index = 0
 
         self.root = tk.Tk()
@@ -112,9 +112,12 @@ class GUI:
             messagebox.showinfo("Result", "Correct!")
             self.correct_count += 1
             self.check_answer_button.config(state="disabled")
+            self.next_button.config(state="active")
         else:
             messagebox.showinfo("Result", f"Wrong! The correct answer was: {correct_answer_text}")
             self.check_answer_button.config(state="disabled")
+            self.next_button.config(state="active")
+            
         with open(f"user_answers/user_answers_{self.timestamp}.txt", "a", encoding="utf-8") as f:
             f.write(f"Q: {self.question_label.cget('text')}\n")
             f.write(f"Selected: {selected_answer_text}\n")
