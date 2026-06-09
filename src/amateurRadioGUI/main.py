@@ -1,3 +1,4 @@
+import os
 import tkinter as tk
 from tkinter import messagebox
 import random
@@ -10,7 +11,14 @@ class GUI:
         self.correct_count = 0
         self.total_count = 0
         self.correct_answer_text = ""
-        questions = [l for l in open("questions.txt", encoding="utf-8").readlines() if l.strip()]
+        try:
+            with open("questions.txt", encoding="utf-8") as f:
+                questions = [l for l in f.readlines() if l.strip()]
+        except FileNotFoundError:
+            messagebox.showerror("File Not Found", "The questions.txt file was not found.\n"
+                                 "Please make sure it is in the same directory as this program.\n"
+                                 "Refer to where_questions.md for instructions on how to download the questions. \n")
+            raise
 
         self.hundred_random_questions = random.sample(questions, 100)
 
@@ -117,14 +125,19 @@ class GUI:
             messagebox.showinfo("Result", f"Wrong! The correct answer was: {correct_answer_text}")
             self.check_answer_button.config(state="disabled")
             self.next_button.config(state="active")
-            
-        with open(f"user_answers/user_answers_{self.timestamp}.txt", "a", encoding="utf-8") as f:
-            f.write(f"Q: {self.question_label.cget('text')}\n")
-            f.write(f"Selected: {selected_answer_text}\n")
-            f.write(f"Correct: {correct_answer_text}\n\n")
-            f.write("-" * 40 + "\n\n")
+
+        try:
+            os.makedirs("user_answers", exist_ok=True)
+            with open(f"user_answers/user_answers_{self.timestamp}.txt", "a", encoding="utf-8") as f:
+                f.write(f"Q: {self.question_label.cget('text')}\n")
+                f.write(f"Selected: {selected_answer_text}\n")
+                f.write(f"Correct: {correct_answer_text}\n\n")
+                f.write("-" * 40 + "\n\n")
+        except Exception as e:
+            messagebox.showerror("File Error", f"An error occurred while saving your answer: {e}")
 
         self.total_count += 1
+        self.current_question_index += 1
         self.qa_so_far_var.set(f"Questions Answered: {self.total_count}")
         self.correct_so_far_var.set(f"Correct Answers: {self.correct_count}")
         self.next_button.config(state="active")
