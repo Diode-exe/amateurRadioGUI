@@ -4,7 +4,13 @@ from tkinter import messagebox
 import random
 import datetime
 
-from calculators import Calculators
+from calculators.calcs import Calculators
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Point precisely to the data folder
+QUESTIONS_PATH = os.path.join(SCRIPT_DIR, "data", "questions.txt")
+RANDOM_QUESTIONS_PATH = os.path.join(SCRIPT_DIR, "data", "random_questions.txt")
 
 class GUI:
     def __init__(self):
@@ -12,7 +18,7 @@ class GUI:
         self.total_count = 0
         self.correct_answer_text = ""
         try:
-            with open("questions.txt", encoding="utf-8") as f:
+            with open(QUESTIONS_PATH, encoding="utf-8") as f:
                 questions = [l for l in f.readlines() if l.strip()]
         except FileNotFoundError:
             messagebox.showerror("File Not Found", "The questions.txt file was not found.\n"
@@ -22,7 +28,7 @@ class GUI:
 
         self.hundred_random_questions = random.sample(questions, 100)
 
-        with open("random_questions.txt", "w", encoding="utf-8") as f:
+        with open(RANDOM_QUESTIONS_PATH, "w", encoding="utf-8") as f:
             f.writelines(self.hundred_random_questions)
 
         self.timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -127,8 +133,8 @@ class GUI:
             self.next_button.config(state="active")
 
         try:
-            os.makedirs("user_answers", exist_ok=True)
-            with open(f"user_answers/user_answers_{self.timestamp}.txt", "a", encoding="utf-8") as f:
+            os.makedirs(os.path.join(SCRIPT_DIR, "data", "user_answers"), exist_ok=True)
+            with open(os.path.join(SCRIPT_DIR, "data", "user_answers", f"user_answers_{self.timestamp}.txt"), "a", encoding="utf-8") as f:
                 f.write(f"Q: {self.question_label.cget('text')}\n")
                 f.write(f"Selected: {selected_answer_text}\n")
                 f.write(f"Correct: {correct_answer_text}\n\n")

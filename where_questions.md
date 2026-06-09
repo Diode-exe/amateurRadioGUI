@@ -4,6 +4,6 @@ From [https://ised-isde.canada.ca/site/amateur-radio-operator-certificate-servic
 
 Click on the link in purple:
 
-![Download questions](images/link_in_purple.png)
+![Download questions](src/amateurRadioGUI/assets/link_in_purple.png)
 
-Extract the downloaded .zip file and copy `amat_basic_quest_delim.txt` to the root of the project folder and rename it to `questions.txt`.
+Extract the downloaded .zip file and copy `amat_basic_quest_delim.txt` to `src/amateurRadioGUI/data` and rename it to `questions.txt`.

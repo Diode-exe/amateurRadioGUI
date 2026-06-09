@@ -1,9 +1,9 @@
 from tkinter import ttk
 import tkinter as tk
-from calc_source.ohms_law import OhmsLawCalculator
-from calc_source.wavelength import WavelengthCalculator
-from calc_source.reduced_power import ReducedPowerCalculator
-from calc_source.frequency_meter import FrequencyMeterConverter
+from .ohms_law import OhmsLawCalculator
+from .wavelength import WavelengthCalculator
+from .reduced_power import ReducedPowerCalculator
+from .frequency_meter import FrequencyMeterConverter
 
 class Calculators:
     def __init__(self, parent):
