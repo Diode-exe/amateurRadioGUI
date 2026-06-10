@@ -63,7 +63,7 @@ class GUI:
             btn = tk.Radiobutton(self.root, text="", variable=self.selected_answer, value=str(i), font=("Arial", 12))
             btn.pack(anchor="w")
             self.choice_buttons.append(btn)
-        self.choice_buttons[0].config(state="active")
+        self.choice_buttons[0].config(state="normal")
 
         self.qa_so_far_frame = tk.Frame(self.root)
         self.qa_so_far_frame.pack(pady=10)
@@ -85,7 +85,7 @@ class GUI:
         self.show_random_question()
 
     def show_random_question(self):
-        self.check_answer_button.config(state="active")
+        self.check_answer_button.config(state="normal")
         self.next_button.config(state="disabled")
         # line to derive question and answer from
         # qa_derive_from = random.choice(self.hundred_random_questions).split(";")
@@ -126,11 +126,11 @@ class GUI:
             messagebox.showinfo("Result", "Correct!")
             self.correct_count += 1
             self.check_answer_button.config(state="disabled")
-            self.next_button.config(state="active")
+            self.next_button.config(state="normal")
         else:
             messagebox.showinfo("Result", f"Wrong! The correct answer was: {correct_answer_text}")
             self.check_answer_button.config(state="disabled")
-            self.next_button.config(state="active")
+            self.next_button.config(state="normal")
 
         try:
             os.makedirs(os.path.join(SCRIPT_DIR, "data", "user_answers"), exist_ok=True)
@@ -146,7 +146,7 @@ class GUI:
         self.current_question_index += 1
         self.qa_so_far_var.set(f"Questions Answered: {self.total_count}")
         self.correct_so_far_var.set(f"Correct Answers: {self.correct_count}")
-        self.next_button.config(state="active")
+        self.next_button.config(state="normal")
         if self.total_count >= 100:
             messagebox.showinfo("Test Complete", f"You've completed the test! Your score: {self.correct_count}/100")
             self.check_answer_button.config(state="disabled")
@@ -160,9 +160,9 @@ class GUI:
             self.root.destroy()
 
     def enter_check_next(self, event):
-        if self.check_answer_button['state'] == 'active':
+        if self.check_answer_button['state'] == 'normal':
             self.check_answer()
-        elif self.next_button['state'] == 'active':
+        elif self.next_button['state'] == 'normal':
             self.show_random_question()
         else:
             # This case should not happen, but just in case both buttons are disabled, we can show a warning
