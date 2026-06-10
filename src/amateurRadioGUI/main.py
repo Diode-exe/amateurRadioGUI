@@ -5,6 +5,7 @@ import random
 import datetime
 
 from calculators.calcs import Calculators
+from reference.q_codes import QCodes
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -52,6 +53,9 @@ class GUI:
         # self.calculators = Calculators(self)
         self.calculators_button = tk.Button(self.calculators_frame, text="Open Calculators", command=self.open_calculators)
         self.calculators_button.pack()
+        
+        self.references_button = tk.Button(self.calculators_frame, text="Q-code References", command=self.open_references)
+        self.references_button.pack(pady=5)
 
         self.question_label = tk.Label(self.root, text="", wraplength=400, font=("Arial", 14))
         self.question_label.pack(pady=20)
@@ -154,6 +158,9 @@ class GUI:
 
     def open_calculators(self):
         calcu = Calculators(self)
+        
+    def open_references(self):
+        q_codes_ref = QCodes(self)
 
     def closer(self):
         if messagebox.askyesno("Quit", "Do you want to quit?"):
