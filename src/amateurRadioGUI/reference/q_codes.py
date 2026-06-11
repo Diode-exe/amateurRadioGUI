@@ -3,7 +3,19 @@ from tkinter import ttk
 
 
 class QCodes:
+    """A window showing Q-codes in a searchable lookup table.
+
+    The class builds a Toplevel window containing a search entry and a
+    `ttk.Treeview` populated with Q-code/meaning pairs. Double-clicking a
+    row opens a detail window with the full text.
+    """
+
     def __init__(self, parent):
+        """Create the Q-codes window and populate the lookup table.
+
+        Args:
+            parent: The application GUI instance that contains `root`.
+        """
         self.parent = parent
         self.q_codes_window = tk.Toplevel(self.parent.root)
         self.q_codes_window.title("Q-Codes Reference")
@@ -64,10 +76,10 @@ class QCodes:
             'QSG Shall I send ____ telegrams (messages) at a time? - Send ____ telegrams (messages) at a time.\n\n',
             'QSK Can you hear me between your signals? - I can hear you between my signals.\n\n',
             'QSL Can you acknowledge receipt? - I will acknowledge receipt.\n\n',
-            'QSM Shall I repeat the last telegram (message) which I sent yo\n\nu, or some previous telegram (message)? - Repeat the last telegram (message) which you sent me (or telegram(s) / message(s) numbers(s) ____ ).\n\n',
+            'QSM Shall I repeat the last telegram (message) which I sent yo\n+\n+u, or some previous telegram (message)? - Repeat the last telegram (message) which you sent me (or telegram(s) / message(s) numbers(s) ____ ).\n\n',
             'QSN Did you hear me (or ____ (call sign)) on ____ kHz (or MHz)? - I did hear you (or ____ (call sign)) on ____ kHz (or MHz).\n\n',
             'QSO Can you communicate with ____ direct or by relay? - I can communicate with ____ direct (or by relay through ____ ).\n\n',
-            'QSP Will you relay a message to ____ ? - I will relay a message to ____ .\n\n',
+            'QSP Will you relay a message to ____\xa0? - I will relay a message to ____ .\n\n',
             'QSR Do you want me to repeat my call? - Please repeat your call; I did not hear you.\n\n',
             'QSS What working frequency will you use? - I will use the working frequency ____ kHz (or MHz).\n\n',
             'QST Should I repeat the prior message to all amateurs I contact? - Here follows a broadcast message to all amateurs.\n\n',
@@ -85,8 +97,9 @@ class QCodes:
             'QUA Have you news of ____ (call sign)? - Here is news of ____ (call sign).\n\n',
             'QUC What is the number (or other indication) of the last message you received from me (or from ____ (call sign))? - The number (or other indication) of the last message I received from you (or from ____ (call sign)) is ____.\n\n',
             'QUD Have you received the urgency signal sent by ____ (call sign of mobile station)? - I have received the urgency signal sent by ____ (call sign of mobile station) at ____ hours.\n\n',
-            'QUE Can you speak in ____ (language) – with interpreter if necessary – if s\n\no, on what frequencies? - I can speak in ____ (language) on ____ kHz (or MHz).\n\n',
-            'QUF Have you received the distress signal sent by ____ (call sign of mobile station)? - I have received the distress signal sent by ____ (call sign of mobile station) at ____ hours.\n\n']
+            'QUE Can you speak in ____ (language) – with interpreter if necessary – if s\n+\no, on what frequencies? - I can speak in ____ (language) on ____ kHz (or MHz).\n\n',
+            'QUF Have you received the distress signal sent by ____ (call sign of mobile station)? - I have received the distress signal sent by ____ (call sign of mobile station) at ____ hours.\n\n'
+        ]
 
         # Parse into (code, meaning) tuples
         self.entries = []
@@ -102,6 +115,14 @@ class QCodes:
         self._populate_tree(self.entries)
 
     def _populate_tree(self, entries):
+        """Populate the `Treeview` with the provided entries.
+
+        Each entry is a `(code, meaning)` tuple. Meanings are collapsed into
+        a single-line preview to keep the table compact.
+
+        Args:
+            entries: Iterable of `(code, meaning)` tuples to insert.
+        """
         self.tree.delete(*self.tree.get_children())
         for code, meaning in entries:
             preview = " ".join(meaning.splitlines())
@@ -110,6 +131,14 @@ class QCodes:
             self.tree.insert("", "end", values=(code, preview))
 
     def _on_search(self, event=None):
+        """Filter the displayed entries using the search box content.
+
+        Performs a case-insensitive substring match against the code and
+        meaning fields and repopulates the tree with the filtered results.
+
+        Args:
+            event: Optional Tk event passed from the key release binding.
+        """
         q = self.search_var.get().strip().lower()
         if not q:
             self._populate_tree(self.entries)
@@ -118,6 +147,15 @@ class QCodes:
         self._populate_tree(filtered)
 
     def _on_double_click(self, event):
+        """Open a detail window showing the full meaning for the clicked row.
+
+        The method identifies the row under the mouse `event`, looks up the
+        full meaning from the stored entries, and opens a read-only `Text`
+        window to present the full content.
+
+        Args:
+            event: Tk event from the double-click binding.
+        """
         item_id = self.tree.identify_row(event.y)
         if not item_id:
             return

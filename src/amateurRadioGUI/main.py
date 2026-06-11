@@ -1,3 +1,9 @@
+"""Main GUI module for the Amateur Radio practice test application.
+
+Provides the `GUI` class which manages the main window, question flow,
+user interactions, and opening auxiliary tools (calculators and references).
+"""
+
 import os
 import tkinter as tk
 from tkinter import messagebox
@@ -14,7 +20,20 @@ QUESTIONS_PATH = os.path.join(SCRIPT_DIR, "data", "questions.txt")
 RANDOM_QUESTIONS_PATH = os.path.join(SCRIPT_DIR, "data", "random_questions.txt")
 
 class GUI:
+    """Main application GUI for running the practice test.
+
+    Responsibilities:
+    - load question data and prepare a randomized subset
+    - render the main Tkinter window and controls
+    - handle answer selection, checking, and persistence of user answers
+    """
+
     def __init__(self):
+        """Initialize application state, load questions, and build the UI.
+
+        Raises:
+            FileNotFoundError: if the questions data file cannot be found.
+        """
         self.correct_count = 0
         self.total_count = 0
         self.correct_answer_text = ""
@@ -53,7 +72,7 @@ class GUI:
         # self.calculators = Calculators(self)
         self.calculators_button = tk.Button(self.calculators_frame, text="Open Calculators", command=self.open_calculators)
         self.calculators_button.pack()
-        
+
         self.references_button = tk.Button(self.calculators_frame, text="Q-code References", command=self.open_references)
         self.references_button.pack(pady=5)
 
@@ -89,6 +108,12 @@ class GUI:
         self.show_random_question()
 
     def show_random_question(self):
+        """Display the next question and present shuffled answer choices.
+
+        This method updates the question label and radiobuttons with a new
+        question taken from the pre-selected randomized list. The correct
+        answer text is stored for later comparison in `check_answer()`.
+        """
         self.check_answer_button.config(state="normal")
         self.next_button.config(state="disabled")
         # line to derive question and answer from
@@ -114,6 +139,12 @@ class GUI:
             btn.deselect()
 
     def check_answer(self):
+        """Evaluate the selected answer, show feedback, and save the result.
+
+        Compares the user's selection to the stored correct answer, updates
+        score counters, writes a record to a per-run answers file, and
+        advances internal indices so the next question can be shown.
+        """
         sel = self.selected_answer.get()
         if not sel:
             messagebox.showwarning("No selection", "Please select an answer first.")
@@ -157,16 +188,24 @@ class GUI:
             self.next_button.config(state="disabled")
 
     def open_calculators(self):
+        """Open the calculators window (delegates to `Calculators`)."""
         calcu = Calculators(self)
-        
+
     def open_references(self):
+        """Open the Q-code reference window (delegates to `QCodes`)."""
         q_codes_ref = QCodes(self)
 
     def closer(self):
+        """Prompt the user for confirmation and close the application."""
         if messagebox.askyesno("Quit", "Do you want to quit?"):
             self.root.destroy()
 
     def enter_check_next(self, event):
+        """Handle the Enter key to either check the current answer or go next.
+
+        Bound to the root window; chooses the appropriate action depending on
+        which buttons are enabled.
+        """
         if self.check_answer_button['state'] == 'normal':
             self.check_answer()
         elif self.next_button['state'] == 'normal':

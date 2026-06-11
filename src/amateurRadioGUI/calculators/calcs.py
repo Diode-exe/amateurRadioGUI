@@ -1,3 +1,5 @@
+"""Calculator window and controller for amateur radio tools."""
+
 from tkinter import ttk
 import tkinter as tk
 from .ohms_law import OhmsLawCalculator
