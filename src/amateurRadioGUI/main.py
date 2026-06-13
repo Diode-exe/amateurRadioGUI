@@ -37,6 +37,7 @@ class GUI:
         self.correct_count = 0
         self.total_count = 0
         self.correct_answer_text = ""
+        self.dark_mode = False
         try:
             with open(QUESTIONS_PATH, encoding="utf-8") as f:
                 questions = [l for l in f.readlines() if l.strip()]
@@ -75,6 +76,9 @@ class GUI:
 
         self.references_button = tk.Button(self.calculators_frame, text="Q-code References", command=self.open_references)
         self.references_button.pack(pady=5)
+
+        self.dark_light_button = tk.Button(self.calculators_frame, text="Toggle Dark/Light Mode", command=self.toggle_dark_light_mode)
+        self.dark_light_button.pack(pady=5, side="right")
 
         self.question_label = tk.Label(self.root, text="", wraplength=400, font=("Arial", 14))
         self.question_label.pack(pady=20)
@@ -214,6 +218,36 @@ class GUI:
             # This case should not happen, but just in case both buttons are disabled, we can show a warning
             # hopefully this fixes a bug with the Enter key not working after switching windows
             messagebox.showwarning("Something went wrong", "Both buttons are disabled (for some reason). Please try again.")
+
+    def toggle_dark_light_mode(self):
+        """Toggle between dark and light mode for the application."""
+        if self.dark_mode:
+            # Switch to light mode
+            self.root.config(bg="SystemButtonFace")
+            self.question_label.config(bg="SystemButtonFace", fg="black")
+            for btn in self.choice_buttons:
+                btn.config(bg="SystemButtonFace", fg="black", selectcolor="SystemButtonFace")
+            self.qa_so_far_frame.config(bg="SystemButtonFace")
+            self.answer_so_far_label.config(bg="SystemButtonFace", fg="black")
+            self.correct_so_far_label.config(bg="SystemButtonFace", fg="black")
+            self.calculators_frame.config(bg="SystemButtonFace")
+            self.calculators_button.config(bg="SystemButtonFace", fg="black")
+            self.references_button.config(bg="SystemButtonFace", fg="black")
+            self.dark_light_button.config(bg="SystemButtonFace", fg="black")
+        else:
+            # Switch to dark mode
+            self.root.config(bg="#2e2e2e")
+            self.question_label.config(bg="#2e2e2e", fg="white")
+            for btn in self.choice_buttons:
+                btn.config(bg="#2e2e2e", fg="white", selectcolor="#4d4d4d")
+            self.qa_so_far_frame.config(bg="#2e2e2e")
+            self.answer_so_far_label.config(bg="#2e2e2e", fg="white")
+            self.correct_so_far_label.config(bg="#2e2e2e", fg="white")
+            self.calculators_frame.config(bg="#2e2e2e")
+            self.calculators_button.config(bg="#4d4d4d", fg="white")
+            self.references_button.config(bg="#4d4d4d", fg="white")
+            self.dark_light_button.config(bg="#4d4d4d", fg="white")
+        self.dark_mode = not self.dark_mode
 
 if __name__ == "__main__":
     gui = GUI()
