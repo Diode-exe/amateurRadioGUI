@@ -50,7 +50,7 @@ class GUI:
                     url = "https://apc-cap.ic.gc.ca/datafiles/amat_basic_quest.zip"
                 else:
                     url = "https://apc-cap.ic.gc.ca/datafiles/amat_adv_quest.zip"
-                # Call the download function here
+
                 network_utils = NetworkUtils()
                 network_utils.download_questions(url)
                 with open(QUESTIONS_PATH, encoding="utf-8") as f:
