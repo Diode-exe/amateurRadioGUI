@@ -13,3 +13,5 @@ questions.txt
 user_answers/
 user_answers_*.txt
 random_questions.txt
+src/amateurRadioGUI/data/lisezmoi_base.txt
+src/amateurRadioGUI/data/readme_basic.txt

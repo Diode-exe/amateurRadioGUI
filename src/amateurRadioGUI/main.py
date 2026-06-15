@@ -10,6 +10,7 @@ from tkinter import messagebox
 import random
 import datetime
 
+from utils.network_utils import NetworkUtils
 from calculators.calcs import Calculators
 from reference.q_codes import QCodes
 
@@ -42,10 +43,18 @@ class GUI:
             with open(QUESTIONS_PATH, encoding="utf-8") as f:
                 questions = [l for l in f.readlines() if l.strip()]
         except FileNotFoundError:
-            messagebox.showerror("File Not Found", "The questions.txt file was not found.\n"
-                                 "Please make sure it is in the same directory as this program.\n"
-                                 "Refer to where_questions.md for instructions on how to download the questions. \n")
-            raise
+            if messagebox.askyesno("File Not Found", "The questions.txt file was not found.\n"
+                                 "Would you like the program to download it?\n"):
+                if messagebox.askyesnocancel("Download Questions", "Would you like basic or advanced questions?\n"
+                                             "Yes for basic, No for advanced."):
+                    url = "https://apc-cap.ic.gc.ca/datafiles/amat_basic_quest.zip"
+                else:
+                    url = "https://apc-cap.ic.gc.ca/datafiles/amat_adv_quest.zip"
+                # Call the download function here
+                network_utils = NetworkUtils()
+                network_utils.download_questions(url)
+                with open(QUESTIONS_PATH, encoding="utf-8") as f:
+                    questions = [l for l in f.readlines() if l.strip()]
 
         self.hundred_random_questions = random.sample(questions, 100)
 
