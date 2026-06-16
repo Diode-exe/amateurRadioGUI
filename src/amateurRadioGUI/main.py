@@ -75,7 +75,7 @@ class GUI:
         self.root.geometry("500x400")
         self.root.state("zoomed")  # Start with zoomed window
         self.root.protocol("WM_DELETE_WINDOW", self.closer)
-        self.root.bind("<Return>", self.enter_check_next)
+        self.root.bind("<Return>", self.enter_key_router)
         self.root.bind("1", lambda e: self.choice_buttons[0].invoke())
         self.root.bind("2", lambda e: self.choice_buttons[1].invoke())
         self.root.bind("3", lambda e: self.choice_buttons[2].invoke())
@@ -138,7 +138,7 @@ class GUI:
         if messagebox.askyesno("Quit", "Do you want to quit?"):
             self.root.destroy()
 
-    def enter_check_next(self, event):
+    def enter_key_router(self, event):
         """Handle the Enter key to either check the current answer or go next.
 
         Bound to the root window; chooses the appropriate action depending on
