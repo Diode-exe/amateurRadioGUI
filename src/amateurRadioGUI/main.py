@@ -4,6 +4,7 @@ Provides the `GUI` class which manages the main window, question flow,
 user interactions, and opening auxiliary tools (calculators and references).
 """
 
+import json
 import os
 import tkinter as tk
 from tkinter import messagebox
@@ -19,6 +20,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 # Point precisely to the data folder
 QUESTIONS_PATH = os.path.join(SCRIPT_DIR, "data", "questions.txt")
 RANDOM_QUESTIONS_PATH = os.path.join(SCRIPT_DIR, "data", "random_questions.txt")
+CONFIG_PATH = os.path.join(SCRIPT_DIR, "config", "config.json")
 
 class GUI:
     """Main application GUI for running the practice test.
@@ -39,6 +41,27 @@ class GUI:
         self.total_count = 0
         self.correct_answer_text = ""
         self.dark_mode = False
+        try:
+            with open(CONFIG_PATH, encoding="utf-8") as f:
+                config = json.load(f)
+                self.french_mode = config.get("french_mode", False)
+        except FileNotFoundError:
+            self.french_mode = False
+
+        if not self.french_mode:
+            # english mode
+            self.question_index = 1
+            self.correct_answer_index = 2
+            self.four_answers_start_index = 2
+            self.four_answers_end_index = 5
+        else:
+            self.question_index = 6
+            self.correct_answer_index = 7
+            self.four_answers_start_index = 7
+            self.four_answers_end_index = 11
+            # correct_answer = qa_derive_from[2].strip()
+            # four_answers = qa_derive_from[2:6]
+
         try:
             with open(QUESTIONS_PATH, encoding="utf-8") as f:
                 questions = [l for l in f.readlines() if l.strip()]
@@ -95,10 +118,17 @@ class GUI:
         self.selected_answer = tk.StringVar()
         self.selected_answer.set("")
         self.choice_buttons = []
-        for i in range(4):
-            btn = tk.Radiobutton(self.root, text="", variable=self.selected_answer, value=str(i), font=("Arial", 12))
-            btn.pack(anchor="w")
-            self.choice_buttons.append(btn)
+        if not self.french_mode:
+            # english mode
+            for i in range(4):
+                btn = tk.Radiobutton(self.root, text="", variable=self.selected_answer, value=str(i), font=("Arial", 12))
+                btn.pack(anchor="w")
+                self.choice_buttons.append(btn)
+        else:
+            for i in range(8, 12):
+                btn = tk.Radiobutton(self.root, text="", variable=self.selected_answer, value=str(i), font=("Arial", 12))
+                btn.pack(anchor="w")
+                self.choice_buttons.append(btn)
         self.choice_buttons[0].config(state="normal")
 
         self.qa_so_far_frame = tk.Frame(self.root)
@@ -132,9 +162,13 @@ class GUI:
         # line to derive question and answer from
         # qa_derive_from = random.choice(self.hundred_random_questions).split(";")
         qa_derive_from = self.hundred_random_questions[self.current_question_index].split(";")
-        four_answers = qa_derive_from[2:6]
-        correct_answer = qa_derive_from[2].strip()
-        question = qa_derive_from[1].strip()
+        # print(f"DEBUG: qa_derive_from = {qa_derive_from}")  # Debug print to check the structure of the question data
+        question = qa_derive_from[self.question_index].strip()
+        # print(f"DEBUG: question = {question}")  # Debug print to check the extracted question
+        correct_answer = qa_derive_from[self.correct_answer_index].strip()
+        # print(f"DEBUG: correct_answer = {correct_answer}")  # Debug print to check the extracted correct answer
+        four_answers = qa_derive_from[self.four_answers_start_index:self.four_answers_end_index]
+        # print(f"DEBUG: four_answers = {four_answers}")  # Debug print to check the extracted answer choices
 
         # print(question)
         # print(four_answers)
