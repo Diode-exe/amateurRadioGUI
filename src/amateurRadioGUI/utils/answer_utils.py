@@ -44,8 +44,8 @@ class AnswerUtils:
             gui_ref.next_button.config(state="normal")
         if SCRIPT_DIR_REF:
             try:
-                os.makedirs(os.path.join(SCRIPT_DIR_REF, "..", "data", "user_answers"), exist_ok=True)
-                with open(os.path.join(SCRIPT_DIR_REF, "..", "data", "user_answers", f"user_answers_{timestamp_ref}.txt"), "a", encoding="utf-8") as f:
+                os.makedirs(os.path.join(SCRIPT_DIR_REF, "data", "user_answers"), exist_ok=True)
+                with open(os.path.join(SCRIPT_DIR_REF, "data", "user_answers", f"user_answers_{timestamp_ref}.txt"), "a", encoding="utf-8") as f:
                     f.write(f"Q: {gui_ref.question_label.cget('text')}\n")
                     f.write(f"Selected: {selected_answer_text}\n")
                     f.write(f"Correct: {correct_answer_text}\n\n")

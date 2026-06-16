@@ -125,7 +125,6 @@ class GUI:
 
         question_utils.show_random_question(gui_ref=self, hundred_random_questions_ref=self.hundred_random_questions, current_question_index_ref=self.current_question_index)
 
-
     def open_calculators(self):
         """Open the calculators window (delegates to `Calculators`)."""
         calcu = Calculators(self)
