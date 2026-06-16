@@ -93,7 +93,11 @@ class GUI:
         self.root.state("zoomed")  # Start with zoomed window
         self.root.protocol("WM_DELETE_WINDOW", self.closer)
 
+        self.build_ui()
+        self.bind_keys()
+
     def build_ui(self):
+        """Construct the main window UI elements."""
         self.calculators_frame = tk.Frame(self.root)
         self.calculators_frame.pack(pady=10)
 
@@ -129,7 +133,7 @@ class GUI:
         self.correct_so_far_label = tk.Label(self.qa_so_far_frame, textvariable=self.correct_so_far_var, font=("Arial", 12))
         self.correct_so_far_label.pack(side="left", padx=10)
 
-        self.check_answer_button = tk.Button(self.root, text="Check Answer", command=lambda: answer_utils.check_answer(gui_ref=self, SCRIPT_DIR_REF=SCRIPT_DIR, timestamp_ref=self.timestamp))
+        self.check_answer_button = tk.Button(self.root, text="Check Answer", command=lambda: answer_utils.check_answer(gui_ref=self, script_dir_ref=SCRIPT_DIR, timestamp_ref=self.timestamp))
         self.check_answer_button.pack(pady=10)
 
         self.next_button = tk.Button(self.root, text="Next Question", command=lambda: question_utils.show_random_question(gui_ref=self, hundred_random_questions_ref=self.hundred_random_questions, current_question_index_ref=self.current_question_index))
@@ -138,6 +142,7 @@ class GUI:
         question_utils.show_random_question(gui_ref=self, hundred_random_questions_ref=self.hundred_random_questions, current_question_index_ref=self.current_question_index)
 
     def bind_keys(self):
+        """Bind keyboard shortcuts for answer selection and button actions."""
         self.root.bind("<Return>", self.enter_key_router)
         self.root.bind("1", lambda e: self.choice_buttons[0].invoke())
         self.root.bind("2", lambda e: self.choice_buttons[1].invoke())
@@ -157,14 +162,14 @@ class GUI:
         if messagebox.askyesno("Quit", "Do you want to quit?"):
             self.root.destroy()
 
-    def enter_key_router(self, event):
+    def enter_key_router(self, event): # pylint: disable=unused-argument
         """Handle the Enter key to either check the current answer or go next.
 
         Bound to the root window; chooses the appropriate action depending on
         which buttons are enabled.
         """
         if self.check_answer_button['state'] == 'normal':
-            answer_utils.check_answer(gui_ref=self, SCRIPT_DIR_REF=SCRIPT_DIR, timestamp_ref=self.timestamp)
+            answer_utils.check_answer(gui_ref=self, script_dir_ref=SCRIPT_DIR, timestamp_ref=self.timestamp)
         elif self.next_button['state'] == 'normal':
             question_utils.show_random_question(gui_ref=self, hundred_random_questions_ref=self.hundred_random_questions, current_question_index_ref=self.current_question_index)
         else:

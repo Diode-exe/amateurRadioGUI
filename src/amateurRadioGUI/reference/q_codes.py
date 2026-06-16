@@ -1,6 +1,7 @@
+"""A reference window showing Q-codes in a searchable lookup table."""
+
 import tkinter as tk
 from tkinter import ttk
-
 
 class QCodes:
     """A window showing Q-codes in a searchable lookup table.
@@ -130,7 +131,7 @@ class QCodes:
                 preview = preview[:237] + "..."
             self.tree.insert("", "end", values=(code, preview))
 
-    def _on_search(self, event=None):
+    def _on_search(self, event=None): # pylint: disable=unused-argument
         """Filter the displayed entries using the search box content.
 
         Performs a case-insensitive substring match against the code and

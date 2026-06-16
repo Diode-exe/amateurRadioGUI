@@ -1,3 +1,5 @@
+"""Utility functions for question display and answer checking in the amateur radio GUI application."""
+
 import random
 
 class QuestionUtils:

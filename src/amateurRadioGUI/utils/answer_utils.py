@@ -1,3 +1,5 @@
+"""Utility class for checking answers, providing feedback, and recording results."""
+
 import os
 from tkinter import messagebox
 
@@ -11,7 +13,7 @@ class AnswerUtils:
     def __init__(self):
         pass
 
-    def check_answer(self, gui_ref, SCRIPT_DIR_REF=None, timestamp_ref=None):
+    def check_answer(self, gui_ref, script_dir_ref=None, timestamp_ref=None):
         """Evaluate the selected answer, show feedback, and save the result.
         Compares the user's selection to the stored correct answer, updates
         score counters, writes a record to a per-run answers file, and
@@ -42,10 +44,10 @@ class AnswerUtils:
             messagebox.showinfo("Result", f"Wrong! The correct answer was: {correct_answer_text}")
             gui_ref.check_answer_button.config(state="disabled")
             gui_ref.next_button.config(state="normal")
-        if SCRIPT_DIR_REF:
+        if script_dir_ref:
             try:
-                os.makedirs(os.path.join(SCRIPT_DIR_REF, "data", "user_answers"), exist_ok=True)
-                with open(os.path.join(SCRIPT_DIR_REF, "data", "user_answers", f"user_answers_{timestamp_ref}.txt"), "a", encoding="utf-8") as f:
+                os.makedirs(os.path.join(script_dir_ref, "data", "user_answers"), exist_ok=True)
+                with open(os.path.join(script_dir_ref, "data", "user_answers", f"user_answers_{timestamp_ref}.txt"), "a", encoding="utf-8") as f:
                     f.write(f"Q: {gui_ref.question_label.cget('text')}\n")
                     f.write(f"Selected: {selected_answer_text}\n")
                     f.write(f"Correct: {correct_answer_text}\n\n")
