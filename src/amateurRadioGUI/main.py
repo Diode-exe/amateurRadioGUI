@@ -13,12 +13,15 @@ import datetime
 from utils.network_utils import NetworkUtils
 from calculators.calcs import Calculators
 from reference.q_codes import QCodes
+from utils.answer_utils import AnswerUtils
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Point precisely to the data folder
 QUESTIONS_PATH = os.path.join(SCRIPT_DIR, "data", "questions.txt")
 RANDOM_QUESTIONS_PATH = os.path.join(SCRIPT_DIR, "data", "random_questions.txt")
+
+answer_utils = AnswerUtils()  # Create a single instance of AnswerUtils to use throughout the application
 
 class GUI:
     """Main application GUI for running the practice test.
@@ -112,7 +115,7 @@ class GUI:
         self.correct_so_far_label = tk.Label(self.qa_so_far_frame, textvariable=self.correct_so_far_var, font=("Arial", 12))
         self.correct_so_far_label.pack(side="left", padx=10)
 
-        self.check_answer_button = tk.Button(self.root, text="Check Answer", command=self.check_answer)
+        self.check_answer_button = tk.Button(self.root, text="Check Answer", command=lambda: answer_utils.check_answer(gui_ref=self, SCRIPT_DIR_REF=SCRIPT_DIR, timestamp_ref=self.timestamp))
         self.check_answer_button.pack(pady=10)
 
         self.next_button = tk.Button(self.root, text="Next Question", command=self.show_random_question)
@@ -151,54 +154,7 @@ class GUI:
             btn.config(text=shuffled[i])
             btn.deselect()
 
-    def check_answer(self):
-        """Evaluate the selected answer, show feedback, and save the result.
 
-        Compares the user's selection to the stored correct answer, updates
-        score counters, writes a record to a per-run answers file, and
-        advances internal indices so the next question can be shown.
-        """
-        sel = self.selected_answer.get()
-        if not sel:
-            messagebox.showwarning("No selection", "Please select an answer first.")
-            return
-        try:
-            selected_index = int(sel)
-        except ValueError:
-            messagebox.showwarning("Selection error", "Invalid selection.")
-            return
-        selected_answer_text = self.choice_buttons[selected_index].cget("text").strip()
-        correct_answer_text = self.correct_answer_text.strip()
-
-        if selected_answer_text == correct_answer_text:
-            messagebox.showinfo("Result", "Correct!")
-            self.correct_count += 1
-            self.check_answer_button.config(state="disabled")
-            self.next_button.config(state="normal")
-        else:
-            messagebox.showinfo("Result", f"Wrong! The correct answer was: {correct_answer_text}")
-            self.check_answer_button.config(state="disabled")
-            self.next_button.config(state="normal")
-
-        try:
-            os.makedirs(os.path.join(SCRIPT_DIR, "data", "user_answers"), exist_ok=True)
-            with open(os.path.join(SCRIPT_DIR, "data", "user_answers", f"user_answers_{self.timestamp}.txt"), "a", encoding="utf-8") as f:
-                f.write(f"Q: {self.question_label.cget('text')}\n")
-                f.write(f"Selected: {selected_answer_text}\n")
-                f.write(f"Correct: {correct_answer_text}\n\n")
-                f.write("-" * 40 + "\n\n")
-        except Exception as e:
-            messagebox.showerror("File Error", f"An error occurred while saving your answer: {e}")
-
-        self.total_count += 1
-        self.current_question_index += 1
-        self.qa_so_far_var.set(f"Questions Answered: {self.total_count}")
-        self.correct_so_far_var.set(f"Correct Answers: {self.correct_count}")
-        self.next_button.config(state="normal")
-        if self.total_count >= 100:
-            messagebox.showinfo("Test Complete", f"You've completed the test! Your score: {self.correct_count}/100")
-            self.check_answer_button.config(state="disabled")
-            self.next_button.config(state="disabled")
 
     def open_calculators(self):
         """Open the calculators window (delegates to `Calculators`)."""
@@ -220,7 +176,7 @@ class GUI:
         which buttons are enabled.
         """
         if self.check_answer_button['state'] == 'normal':
-            self.check_answer()
+            answer_utils.check_answer(gui_ref=self, SCRIPT_DIR_REF=SCRIPT_DIR, timestamp_ref=self.timestamp)
         elif self.next_button['state'] == 'normal':
             self.show_random_question()
         else:
