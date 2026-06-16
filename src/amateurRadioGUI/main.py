@@ -11,10 +11,10 @@ import random
 import datetime
 
 from utils.network_utils import NetworkUtils
-from calculators.calcs import Calculators
-from reference.q_codes import QCodes
 from utils.answer_utils import AnswerUtils
 from utils.question_utils import QuestionUtils
+from calculators.calcs import Calculators
+from reference.q_codes import QCodes
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -40,6 +40,23 @@ class GUI:
         Raises:
             FileNotFoundError: if the questions data file cannot be found.
         """
+        # ------------------------
+        self.calculators_frame = None
+        self.calculators_button = None
+        self.references_button = None
+        self.dark_light_button = None
+        self.question_label = None
+        self.selected_answer = None
+        self.choice_buttons = []
+        self.qa_so_far_frame = None
+        self.qa_so_far_var = None
+        self.answer_so_far_label = None
+        self.correct_so_far_var = None
+        self.correct_so_far_label = None
+        self.check_answer_button = None
+        self.next_button = None
+        self.timestamp = None
+        # ------------------------
         self.correct_count = 0
         self.total_count = 0
         self.correct_answer_text = ""
@@ -75,12 +92,8 @@ class GUI:
         self.root.geometry("500x400")
         self.root.state("zoomed")  # Start with zoomed window
         self.root.protocol("WM_DELETE_WINDOW", self.closer)
-        self.root.bind("<Return>", self.enter_key_router)
-        self.root.bind("1", lambda e: self.choice_buttons[0].invoke())
-        self.root.bind("2", lambda e: self.choice_buttons[1].invoke())
-        self.root.bind("3", lambda e: self.choice_buttons[2].invoke())
-        self.root.bind("4", lambda e: self.choice_buttons[3].invoke())
 
+    def build_ui(self):
         self.calculators_frame = tk.Frame(self.root)
         self.calculators_frame.pack(pady=10)
 
@@ -97,8 +110,7 @@ class GUI:
         self.question_label = tk.Label(self.root, text="", wraplength=400, font=("Arial", 14))
         self.question_label.pack(pady=20)
 
-        self.selected_answer = tk.StringVar()
-        self.selected_answer.set("")
+        self.selected_answer = tk.StringVar(value="")
         self.choice_buttons = []
         for i in range(4):
             btn = tk.Radiobutton(self.root, text="", variable=self.selected_answer, value=str(i), font=("Arial", 12))
@@ -124,6 +136,13 @@ class GUI:
         self.next_button.pack(pady=10)
 
         question_utils.show_random_question(gui_ref=self, hundred_random_questions_ref=self.hundred_random_questions, current_question_index_ref=self.current_question_index)
+
+    def bind_keys(self):
+        self.root.bind("<Return>", self.enter_key_router)
+        self.root.bind("1", lambda e: self.choice_buttons[0].invoke())
+        self.root.bind("2", lambda e: self.choice_buttons[1].invoke())
+        self.root.bind("3", lambda e: self.choice_buttons[2].invoke())
+        self.root.bind("4", lambda e: self.choice_buttons[3].invoke())
 
     def open_calculators(self):
         """Open the calculators window (delegates to `Calculators`)."""
