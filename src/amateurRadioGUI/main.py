@@ -127,11 +127,11 @@ class GUI:
 
     def open_calculators(self):
         """Open the calculators window (delegates to `Calculators`)."""
-        calcu = Calculators(self)
+        Calculators(self)
 
     def open_references(self):
         """Open the Q-code reference window (delegates to `QCodes`)."""
-        q_codes_ref = QCodes(self)
+        QCodes(self)
 
     def closer(self):
         """Prompt the user for confirmation and close the application."""
