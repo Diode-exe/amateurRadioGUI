@@ -9,6 +9,7 @@ import tkinter as tk
 from tkinter import messagebox
 import random
 import datetime
+from typing import Literal
 
 from utils.network_utils import NetworkUtils
 from utils.answer_utils import AnswerUtils
@@ -102,11 +103,11 @@ class GUI:
         self.calculators_frame.pack(pady=10)
 
         # self.calculators = Calculators(self)
-        self.calculators_button = tk.Button(self.calculators_frame, text="Open Calculators", command=self.open_calculators)
+        self.calculators_button = tk.Button(self.calculators_frame, text="Open Calculators", command=lambda: self.open_window("calculators"))
         self.calculators_button.pack()
 
-        self.references_button = tk.Button(self.calculators_frame, text="Q-code References", command=self.open_references)
-        self.references_button.pack(pady=5)
+        self.q_codes_button = tk.Button(self.calculators_frame, text="Q-code References", command=lambda: self.open_window("q_codes"))
+        self.q_codes_button.pack(pady=5)
 
         self.dark_light_button = tk.Button(self.calculators_frame, text="Toggle Dark/Light Mode", command=self.toggle_dark_light_mode)
         self.dark_light_button.pack(pady=5, side="right")
@@ -149,13 +150,20 @@ class GUI:
         self.root.bind("3", lambda e: self.choice_buttons[2].invoke())
         self.root.bind("4", lambda e: self.choice_buttons[3].invoke())
 
-    def open_calculators(self):
-        """Open the calculators window (delegates to `Calculators`)."""
-        Calculators(self)
+    # def open_calculators(self):
+    #     """Open the calculators window (delegates to `Calculators`)."""
+    #     Calculators(self)
 
-    def open_references(self):
-        """Open the Q-code reference window (delegates to `QCodes`)."""
-        QCodes(self)
+    # def open_references(self):
+    #     """Open the Q-code reference window (delegates to `QCodes`)."""
+    #     QCodes(self)
+
+    def open_window(self, window_name: Literal["calculators", "q_codes"]):
+        """General method to open a new window based on the name."""
+        if window_name == "calculators":
+            Calculators(self)
+        elif window_name == "q_codes":
+            QCodes(self)
 
     def closer(self):
         """Prompt the user for confirmation and close the application."""
@@ -190,7 +198,7 @@ class GUI:
             self.correct_so_far_label.config(bg="SystemButtonFace", fg="black")
             self.calculators_frame.config(bg="SystemButtonFace")
             self.calculators_button.config(bg="SystemButtonFace", fg="black")
-            self.references_button.config(bg="SystemButtonFace", fg="black")
+            self.q_codes_button.config(bg="SystemButtonFace", fg="black")
             self.dark_light_button.config(bg="SystemButtonFace", fg="black")
         else:
             # Switch to dark mode
@@ -203,7 +211,7 @@ class GUI:
             self.correct_so_far_label.config(bg="#2e2e2e", fg="white")
             self.calculators_frame.config(bg="#2e2e2e")
             self.calculators_button.config(bg="#4d4d4d", fg="white")
-            self.references_button.config(bg="#4d4d4d", fg="white")
+            self.q_codes_button.config(bg="#4d4d4d", fg="white")
             self.dark_light_button.config(bg="#4d4d4d", fg="white")
         self.dark_mode = not self.dark_mode
 
