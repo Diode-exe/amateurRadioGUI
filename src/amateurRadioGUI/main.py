@@ -14,6 +14,7 @@ from utils.network_utils import NetworkUtils
 from calculators.calcs import Calculators
 from reference.q_codes import QCodes
 from utils.answer_utils import AnswerUtils
+from utils.question_utils import QuestionUtils
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -21,7 +22,8 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 QUESTIONS_PATH = os.path.join(SCRIPT_DIR, "data", "questions.txt")
 RANDOM_QUESTIONS_PATH = os.path.join(SCRIPT_DIR, "data", "random_questions.txt")
 
-answer_utils = AnswerUtils()  # Create a single instance of AnswerUtils to use throughout the application
+answer_utils = AnswerUtils()
+question_utils = QuestionUtils()
 
 class GUI:
     """Main application GUI for running the practice test.
@@ -118,42 +120,10 @@ class GUI:
         self.check_answer_button = tk.Button(self.root, text="Check Answer", command=lambda: answer_utils.check_answer(gui_ref=self, SCRIPT_DIR_REF=SCRIPT_DIR, timestamp_ref=self.timestamp))
         self.check_answer_button.pack(pady=10)
 
-        self.next_button = tk.Button(self.root, text="Next Question", command=self.show_random_question)
+        self.next_button = tk.Button(self.root, text="Next Question", command=lambda: question_utils.show_random_question(gui_ref=self, hundred_random_questions_ref=self.hundred_random_questions, current_question_index_ref=self.current_question_index))
         self.next_button.pack(pady=10)
 
-        self.show_random_question()
-
-    def show_random_question(self):
-        """Display the next question and present shuffled answer choices.
-
-        This method updates the question label and radiobuttons with a new
-        question taken from the pre-selected randomized list. The correct
-        answer text is stored for later comparison in `check_answer()`.
-        """
-        self.check_answer_button.config(state="normal")
-        self.next_button.config(state="disabled")
-        # line to derive question and answer from
-        # qa_derive_from = random.choice(self.hundred_random_questions).split(";")
-        qa_derive_from = self.hundred_random_questions[self.current_question_index].split(";")
-        four_answers = qa_derive_from[2:6]
-        correct_answer = qa_derive_from[2].strip()
-        question = qa_derive_from[1].strip()
-
-        # print(question)
-        # print(four_answers)
-        # print(correct_answer)
-
-        self.question_label.config(text=question)
-        # shuffle the answers but keep the correct answer text for checking
-        shuffled = four_answers.copy()
-        random.shuffle(shuffled)
-        self.correct_answer_text = correct_answer
-        # clear selection and update radiobuttons
-        self.selected_answer.set("")
-        for i, btn in enumerate(self.choice_buttons):
-            btn.config(text=shuffled[i])
-            btn.deselect()
-
+        question_utils.show_random_question(gui_ref=self, hundred_random_questions_ref=self.hundred_random_questions, current_question_index_ref=self.current_question_index)
 
 
     def open_calculators(self):
@@ -178,7 +148,7 @@ class GUI:
         if self.check_answer_button['state'] == 'normal':
             answer_utils.check_answer(gui_ref=self, SCRIPT_DIR_REF=SCRIPT_DIR, timestamp_ref=self.timestamp)
         elif self.next_button['state'] == 'normal':
-            self.show_random_question()
+            question_utils.show_random_question(gui_ref=self, hundred_random_questions_ref=self.hundred_random_questions, current_question_index_ref=self.current_question_index)
         else:
             # This case should not happen, but just in case both buttons are disabled, we can show a warning
             # hopefully this fixes a bug with the Enter key not working after switching windows
