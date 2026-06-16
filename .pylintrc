@@ -449,6 +449,7 @@ disable=raw-checker-failed,
         E0015, # unrecognized-option
         W0012, # unknown-option-value
         C0301, # line-too-long
+        W0718, # broad-exception-caught
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option

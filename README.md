@@ -43,6 +43,6 @@
 - `src/amateurRadioGUI/main.py` — main application
 - `where_questions.md` — instructions for obtaining `questions.txt`
 
-# French support
+### French support
 
 - Planned but not in active development yet
