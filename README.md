@@ -45,6 +45,4 @@
 
 ## French support
 
-Is partial
-
-The questions will be in french, but the UI will still be in english. To enable this, set `"french_mode": true` in `src/amateurRadioGUI/config/config.json`.
+Is in the works
