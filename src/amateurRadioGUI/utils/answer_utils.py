@@ -13,7 +13,7 @@ class AnswerUtils:
     def __init__(self):
         pass
 
-    def check_answer(self, gui_ref, script_dir_ref=None, timestamp_ref=None):
+    def check_answer(self, root_ref, gui_ref, script_dir_ref=None, timestamp_ref=None):
         """Evaluate the selected answer, show feedback, and save the result.
         Compares the user's selection to the stored correct answer, updates
         score counters, writes a record to a per-run answers file, and
@@ -38,12 +38,9 @@ class AnswerUtils:
         if selected_answer_text == correct_answer_text:
             messagebox.showinfo("Result", "Correct!")
             gui_ref.correct_count += 1
-            gui_ref.check_answer_button.config(state="disabled")
-            gui_ref.next_button.config(state="normal")
         else:
             messagebox.showinfo("Result", f"Wrong! The correct answer was: {correct_answer_text}")
-            gui_ref.check_answer_button.config(state="disabled")
-            gui_ref.next_button.config(state="normal")
+            
         if script_dir_ref:
             try:
                 os.makedirs(os.path.join(script_dir_ref, "data", "user_answers"), exist_ok=True)
@@ -56,10 +53,10 @@ class AnswerUtils:
                 messagebox.showerror("File Error", f"An error occurred while saving your answer: {e}")
 
         gui_ref.total_count += 1
-        gui_ref.current_question_index += 1
         gui_ref.qa_so_far_var.set(f"Questions Answered: {gui_ref.total_count}")
         gui_ref.correct_so_far_var.set(f"Correct Answers: {gui_ref.correct_count}")
-        gui_ref.next_button.config(state="normal")
+        # Notify the GUI that an answer was checked so it can update button states.
+        root_ref.event_generate("<<AnswerChecked>>")
         if gui_ref.total_count >= 100:
             messagebox.showinfo("Test Complete", f"You've completed the test! Your score: {gui_ref.correct_count}/100")
             gui_ref.check_answer_button.config(state="disabled")

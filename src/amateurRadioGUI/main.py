@@ -94,8 +94,9 @@ class GUI:
         self.root.state("zoomed")  # Start with zoomed window
         self.root.protocol("WM_DELETE_WINDOW", self.closer)
 
-        self.build_ui()
         self.bind_keys()
+        self.bind_events()
+        self.build_ui()
 
     def build_ui(self):
         """Construct the main window UI elements."""
@@ -134,13 +135,43 @@ class GUI:
         self.correct_so_far_label = tk.Label(self.qa_so_far_frame, textvariable=self.correct_so_far_var, font=("Arial", 12))
         self.correct_so_far_label.pack(side="left", padx=10)
 
-        self.check_answer_button = tk.Button(self.root, text="Check Answer", command=lambda: answer_utils.check_answer(gui_ref=self, script_dir_ref=SCRIPT_DIR, timestamp_ref=self.timestamp))
+        self.check_answer_button = tk.Button(self.root, text="Check Answer", command=lambda: answer_utils.check_answer(root_ref=self.root, gui_ref=self, script_dir_ref=SCRIPT_DIR, timestamp_ref=self.timestamp), disabledforeground="grey")
         self.check_answer_button.pack(pady=10)
 
-        self.next_button = tk.Button(self.root, text="Next Question", command=lambda: question_utils.show_random_question(gui_ref=self, hundred_random_questions_ref=self.hundred_random_questions, current_question_index_ref=self.current_question_index))
+        self.next_button = tk.Button(self.root, text="Next Question", command=lambda: question_utils.show_random_question(root_ref=self.root, gui_ref=self, hundred_random_questions_ref=self.hundred_random_questions, current_question_index_ref=self.current_question_index), disabledforeground="grey")
         self.next_button.pack(pady=10)
+        # Ensure Next is disabled initially until an answer is checked
+        self.next_button.config(state="disabled")
 
-        question_utils.show_random_question(gui_ref=self, hundred_random_questions_ref=self.hundred_random_questions, current_question_index_ref=self.current_question_index)
+        # Load the first question into the UI (GUI is responsible for
+        # applying the returned data to widgets).
+        self.load_question()
+
+    def load_question(self):
+        """Fetch question data from `question_utils` and apply to widgets.
+
+        This method keeps all GUI updates local to the `GUI` class and
+        advances `self.current_question_index` after successfully loading
+        a question.
+        """
+        data = question_utils.get_question(self.hundred_random_questions, self.current_question_index)
+        if not data:
+            return
+
+        self.question_label.config(text=data["question"])
+        shuffled = data["choices"]
+        self.correct_answer_text = data["correct"]
+        # Clear selection and update radiobuttons
+        self.selected_answer.set("")
+        for i, btn in enumerate(self.choice_buttons):
+            btn.config(text=shuffled[i])
+            btn.deselect()
+
+        # Advance the index so the next call loads the next question
+        self.current_question_index += 1
+
+        # Ensure button states reflect a freshly loaded question
+        self.on_next_question()
 
     def bind_keys(self):
         """Bind keyboard shortcuts for answer selection and button actions."""
@@ -149,6 +180,11 @@ class GUI:
         self.root.bind("2", lambda e: self.choice_buttons[1].invoke())
         self.root.bind("3", lambda e: self.choice_buttons[2].invoke())
         self.root.bind("4", lambda e: self.choice_buttons[3].invoke())
+
+    def bind_events(self):
+        """Bind additional events for window management and interactions."""
+        self.root.bind("<<AnswerChecked>>", self.on_answer_checked)
+        self.root.bind("<<NextQuestion>>", self.on_next_question)
 
     # def open_calculators(self):
     #     """Open the calculators window (delegates to `Calculators`)."""
@@ -177,9 +213,10 @@ class GUI:
         which buttons are enabled.
         """
         if self.check_answer_button['state'] == 'normal':
-            answer_utils.check_answer(gui_ref=self, script_dir_ref=SCRIPT_DIR, timestamp_ref=self.timestamp)
+            answer_utils.check_answer(root_ref=self.root, gui_ref=self, script_dir_ref=SCRIPT_DIR, timestamp_ref=self.timestamp)
         elif self.next_button['state'] == 'normal':
-            question_utils.show_random_question(gui_ref=self, hundred_random_questions_ref=self.hundred_random_questions, current_question_index_ref=self.current_question_index)
+            # Load the next question (GUI handles UI updates).
+            self.load_question()
         else:
             # This case should not happen, but just in case both buttons are disabled, we can show a warning
             # hopefully this fixes a bug with the Enter key not working after switching windows
@@ -214,6 +251,36 @@ class GUI:
             self.q_codes_button.config(bg="#4d4d4d", fg="white")
             self.dark_light_button.config(bg="#4d4d4d", fg="white")
         self.dark_mode = not self.dark_mode
+
+    def on_answer_checked(self, event=None):
+        """Runs immediately after an answer is verified."""
+        print("on_answer_checked handler called")
+        self.check_answer_button.config(state='disabled')
+        # Ensure the visual contrast is clear on platforms/themes where
+        # disabled buttons may look similar to enabled ones.
+        self.check_answer_button.config(fg="grey")
+        self.next_button.config(state='normal', fg="black")
+        self.next_button.focus_set()  # Automatically shifts focus to the active button!
+        # Force the UI to refresh so state changes are visible immediately
+        try:
+            self.root.update_idletasks()
+        except Exception:
+            pass
+
+    def on_next_question(self, event=None):
+        """Runs immediately when a fresh question loads."""
+        print("on_next_question handler called")
+        self.check_answer_button.config(state='normal', fg="black")
+        self.next_button.config(state='disabled', fg="grey")
+        self.check_answer_button.focus_set()  # Shifts focus back to the check button!
+        try:
+            self.root.update_idletasks()
+        except Exception:
+            pass
+
+    def next_question(self, event=None): # pylint: disable=unused-argument
+        """Custom event handler to show the next question."""
+        question_utils.show_random_question(root_ref=self.root, gui_ref=self, hundred_random_questions_ref=self.hundred_random_questions, current_question_index_ref=self.current_question_index)
 
 if __name__ == "__main__":
     gui = GUI()

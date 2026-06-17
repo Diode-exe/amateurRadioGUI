@@ -3,37 +3,41 @@
 import random
 
 class QuestionUtils:
-    """Utility functions related to question display and answer checking."""
+    """Utility functions related to question data handling.
+
+    This class is GUI-agnostic: it provides pure helpers that return
+    question data (text, choices, correct answer) so the caller (the
+    GUI) can update widgets on the main thread. No Tkinter or UI code
+    should exist in this module.
+    """
+
     def __init__(self):
         pass
 
-    def show_random_question(self, gui_ref=None, hundred_random_questions_ref=None, current_question_index_ref=None):
-        """Display the next question and present shuffled answer choices.
+    def get_question(self, hundred_random_questions, index):
+        """Return question data for the given index.
 
-        This method updates the question label and radiobuttons with a new
-        question taken from the pre-selected randomized list. The correct
-        answer text is stored for later comparison in `check_answer()`.
+        Args:
+            hundred_random_questions: list of question lines (pre-shuffled)
+            index: integer index of the question to return
+
+        Returns:
+            dict with keys: 'question', 'choices', 'correct', or None if
+            index is out of range.
         """
-        gui_ref.check_answer_button.config(state="normal")
-        gui_ref.next_button.config(state="disabled")
-        # line to derive question and answer from
-        # qa_derive_from = random.choice(self.hundred_random_questions).split(";")
-        qa_derive_from = hundred_random_questions_ref[current_question_index_ref].split(";")
-        four_answers = qa_derive_from[2:6]
-        correct_answer = qa_derive_from[2].strip()
+        if not hundred_random_questions or index < 0 or index >= len(hundred_random_questions):
+            return None
+
+        qa_derive_from = hundred_random_questions[index].split(";")
         question = qa_derive_from[1].strip()
-
-        # print(question)
-        # print(four_answers)
-        # print(correct_answer)
-
-        gui_ref.question_label.config(text=question)
-        # shuffle the answers but keep the correct answer text for checking
-        shuffled = four_answers.copy()
+        answers = qa_derive_from[2:6]
+        correct = qa_derive_from[2].strip()
+        shuffled = answers.copy()
         random.shuffle(shuffled)
-        gui_ref.correct_answer_text = correct_answer
-        # clear selection and update radiobuttons
-        gui_ref.selected_answer.set("")
-        for i, btn in enumerate(gui_ref.choice_buttons):
-            btn.config(text=shuffled[i])
-            btn.deselect()
+
+        return {
+            "question": question,
+            "choices": shuffled,
+            "correct": correct,
+        }
+    
