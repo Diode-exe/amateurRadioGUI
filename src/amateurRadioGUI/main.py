@@ -135,15 +135,15 @@ class GUI:
         self.correct_so_far_label = tk.Label(self.qa_so_far_frame, textvariable=self.correct_so_far_var, font=("Arial", 12))
         self.correct_so_far_label.pack(side="left", padx=10)
 
-        self.check_answer_button = tk.Button(self.root, text="Check Answer", command=lambda: answer_utils.check_answer(root_ref=self.root, gui_ref=self, script_dir_ref=SCRIPT_DIR, timestamp_ref=self.timestamp), disabledforeground="grey")
+        self.check_answer_button = tk.Button(self.root, text="Check Answer", command=self.user_clicks_check, disabledforeground="grey")
         self.check_answer_button.pack(pady=10)
 
-        self.next_button = tk.Button(self.root, text="Next Question", command=lambda: question_utils.show_random_question(root_ref=self.root, gui_ref=self, hundred_random_questions_ref=self.hundred_random_questions, current_question_index_ref=self.current_question_index), disabledforeground="grey")
+        self.next_button = tk.Button(self.root, text="Next Question", command=self.load_question, state="disabled", disabledforeground="grey")
         self.next_button.pack(pady=10)
         # Ensure Next is disabled initially until an answer is checked
         self.next_button.config(state="disabled")
 
-        # Load the first question into the UI (GUI is responsible for
+        # Load the first question into the UI
         # applying the returned data to widgets).
         self.load_question()
 
@@ -185,6 +185,7 @@ class GUI:
         """Bind additional events for window management and interactions."""
         self.root.bind("<<AnswerChecked>>", self.on_answer_checked)
         self.root.bind("<<NextQuestion>>", self.on_next_question)
+        self.root.bind("<<CorrectAnswer>>", self.correct_answer)
 
     # def open_calculators(self):
     #     """Open the calculators window (delegates to `Calculators`)."""
@@ -213,7 +214,12 @@ class GUI:
         which buttons are enabled.
         """
         if self.check_answer_button['state'] == 'normal':
-            answer_utils.check_answer(root_ref=self.root, gui_ref=self, script_dir_ref=SCRIPT_DIR, timestamp_ref=self.timestamp)
+            try:
+                self.user_clicks_check()
+            except Exception as e:
+                print(f"Error in user_clicks_check: {e}")
+                messagebox.showerror("Error", "An error occurred while checking the answer. Please try again.")
+
         elif self.next_button['state'] == 'normal':
             # Load the next question (GUI handles UI updates).
             self.load_question()
@@ -255,11 +261,21 @@ class GUI:
     def on_answer_checked(self, event=None):
         """Runs immediately after an answer is verified."""
         print("on_answer_checked handler called")
+        self.total_count += 1
+        self.qa_so_far_var.set(f"Questions Answered: {self.total_count}")
+        self.correct_so_far_var.set(f"Correct Answers: {self.correct_count}")
+
         self.check_answer_button.config(state='disabled')
         # Ensure the visual contrast is clear on platforms/themes where
         # disabled buttons may look similar to enabled ones.
         self.check_answer_button.config(fg="grey")
         self.next_button.config(state='normal', fg="black")
+
+        if self.total_count >= 100:
+            messagebox.showinfo("Test Complete", f"You've completed the test! Your score: {self.correct_count}/100")
+            self.check_answer_button.config(state="disabled")
+            self.next_button.config(state="disabled")
+
         self.next_button.focus_set()  # Automatically shifts focus to the active button!
         # Force the UI to refresh so state changes are visible immediately
         try:
@@ -278,9 +294,28 @@ class GUI:
         except Exception:
             pass
 
-    def next_question(self, event=None): # pylint: disable=unused-argument
-        """Custom event handler to show the next question."""
-        question_utils.show_random_question(root_ref=self.root, gui_ref=self, hundred_random_questions_ref=self.hundred_random_questions, current_question_index_ref=self.current_question_index)
+    def correct_answer(self, event=None):
+        """Handle logic for when the user selects the correct answer."""
+        messagebox.showinfo("Result", "Correct!")
+        self.correct_count += 1
+    
+    def user_clicks_check(self):
+        """Safely reads the selection and passes it to the utility file."""
+        if not self.selected_answer.get():
+            messagebox.showwarning("No Selection", "Please select an answer before checking.")
+            return
+
+        chosen_idx = int(self.selected_answer.get())
+        chosen_text = self.choice_buttons[chosen_idx].cget("text").strip()
+
+        answer_utils.check_answer(
+            root_ref=self.root,
+            sel_ref=chosen_text,
+            correct_answer_text=self.correct_answer_text,
+            question_text=self.question_label.cget("text"),
+            script_dir_ref=SCRIPT_DIR,
+            timestamp_ref=self.timestamp
+        )
 
 if __name__ == "__main__":
     gui = GUI()

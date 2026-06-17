@@ -40,4 +40,3 @@ class QuestionUtils:
             "choices": shuffled,
             "correct": correct,
         }
-    
