@@ -20,7 +20,7 @@
 - From the project root run:
 
     ```powershell
-    python src/amateurRadioGUI/main.py
+    python3 src/amateurRadioGUI/main.py
     ```
 
 ## Usage
